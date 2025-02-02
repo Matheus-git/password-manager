@@ -39,13 +39,12 @@ This diagram provides an overview of the program, showing the step-by-step proce
    ```sh
    chmod +x passwords.sh
    ```
-
+3. Create the password volume (only once!!):
+   ```sh
+   sudo ./passwords.sh --create-volume
+   ```
+   
 ## Usage
-
-### Create the password volume (only once!!):
-```sh
-sudo ./passwords.sh --create-volume
-```
 
 ### Add a credential:
 ```sh
