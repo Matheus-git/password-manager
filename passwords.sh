@@ -53,7 +53,7 @@ create_volume(){
         --hash SHA-256 --filesystem fat --pim 0 --keyfiles "" --random-source $random -p $VOLUME_PASSWORD > /dev/null
 }
 
-# Mount (encrypts) the volume, last action of the program
+# Mount (decrypts) the volume
 mount_volume(){
     output_file=$(mktemp)
     veracrypt -t -l 1> "$output_file" 1> "$output_file" 2>/dev/null
@@ -74,7 +74,7 @@ mount_volume(){
     touch "$VOLUME_MOUNT_PATH/$FILE_PATH"
 }
 
-# Desmonta ( criptografa ) o volume, última ação do programa
+# Unmounts (encrypts) the volume, last action of the program.
 dismount_volume(){
     veracrypt -t -d "$VOLUME_PATH" --slot $VOLUME_SLOT 
 }
