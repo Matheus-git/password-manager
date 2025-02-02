@@ -102,7 +102,7 @@ get_password(){
 
 # Lists the credentials
 list_credentials(){ 
-    if [ ! -s "$VOLUME_MOUNT_PATH/$FILE_PATH" ]; then
+    if [ -s "$VOLUME_MOUNT_PATH/$FILE_PATH" ]; then
         echo List of credentials:
         awk '{printf "\nID: %d\nE-mail: %s\nPassword: ******\nDescription: %s\n\n----------------\n", NR, $1, $3}' "$VOLUME_MOUNT_PATH/$FILE_PATH"
     else
