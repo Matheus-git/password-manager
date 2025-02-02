@@ -32,12 +32,12 @@ HELP_MESSAGE="
     --get-pass              Copies the password of the credential with the specified ID to the clipboard
 "
 
-VOLUME_PASSWORD="0z&NYKQck,Zh#PtNUe4O"  # Password for mounting the volume
-CONFIG="passwords.conf"                 # Path to the configuration file
+# Feel free to edit these variables 
 FILE_PATH="passwords.txt"               # Name of the file saved inside the volume
+VOLUME_PASSWORD="0z&NYKQck,Zh#PtNUe4O"  # Password for mounting the volume
 VOLUME_MOUNT_PATH=/media/veracrypt      # Where the volume will be mounted
 VOLUME_PATH="passwords.hc"              # Path of the file used as the volume
-VOLUME_SLOT=1                           # Volume slot ( dont edit )
+VOLUME_SLOT=1                           # Volume slot
 
 # Generates a random text
 generate_random_text(){
@@ -53,7 +53,7 @@ create_volume(){
         --hash SHA-256 --filesystem fat --pim 0 --keyfiles "" --random-source $random -p $VOLUME_PASSWORD > /dev/null
 }
 
-# Dismounts (encrypts) the volume, last action of the program
+# Mount (encrypts) the volume, last action of the program
 mount_volume(){
     output_file=$(mktemp)
     veracrypt -t -l 1> "$output_file" 1> "$output_file" 2>/dev/null
@@ -71,7 +71,7 @@ mount_volume(){
         exit 1
     fi
 
-    test -f "$VOLUME_MOUNT_PATH/$FILE_PATH" || touch "$VOLUME_MOUNT_PATH/$FILE_PATH"
+    touch "$VOLUME_MOUNT_PATH/$FILE_PATH"
 }
 
 # Desmonta ( criptografa ) o volume, última ação do programa
@@ -102,7 +102,12 @@ get_password(){
 
 # Lists the credentials
 list_credentials(){ 
-    awk '{printf "\nID: %d\nE-mail: %s\nPassword: ******\nDescription: %s\n\n----------------\n", NR, $1, $3}' "$VOLUME_MOUNT_PATH/$FILE_PATH"
+    if [ ! -s "$VOLUME_MOUNT_PATH/$FILE_PATH" ]; then
+        echo List of credentials:
+        awk '{printf "\nID: %d\nE-mail: %s\nPassword: ******\nDescription: %s\n\n----------------\n", NR, $1, $3}' "$VOLUME_MOUNT_PATH/$FILE_PATH"
+    else
+        echo "No credentials saved"
+    fi
 }
 
 # Adds credentials
@@ -120,17 +125,19 @@ add_credentials(){
     fi
 
     echo -e "$email\t$password\t$description" >> "$VOLUME_MOUNT_PATH/$FILE_PATH"
+    echo Credentials successfully added!
 }
 
 # Removes credentials
 remove_credentials(){
     awk -v n="$1" 'NR!=n' "$VOLUME_MOUNT_PATH/$FILE_PATH" > "$VOLUME_MOUNT_PATH/$FILE_PATH.tmp"
     mv "$VOLUME_MOUNT_PATH/$FILE_PATH.tmp" "$VOLUME_MOUNT_PATH/$FILE_PATH"
+    echo Credentials successfully deleted!
 }
 
 run(){
     case "$1" in
-        "" || --list          )
+        "" | --list          )
             list_credentials
             exit 1
         ;;
